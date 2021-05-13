@@ -27,7 +27,7 @@ namespace HERO_XInput_Gampad_Example
 
         public void RunForever()
         {
-            _pcm.StopCompressor();
+            _pcm.SetSolenoidOutput(1, false);
             Boolean SolenoidTimer = false;
             tal1.ConfigFactoryDefault();
             tal2.ConfigFactoryDefault();
@@ -74,7 +74,7 @@ namespace HERO_XInput_Gampad_Example
                 if (Pressure_Switch)
                 {
                     pressure = "Above threshold";
-                    _pcm.StopCompressor();
+                    _pcm.SetSolenoidOutput(1, false);
                 }
                 Debug.Print("Pressure Value: " + pressure);
 
@@ -83,12 +83,13 @@ namespace HERO_XInput_Gampad_Example
                 Boolean StopCompressor = _gamepad.GetButton(9); //"BACK"-Button
                 if (StartCompressor && (!Pressure_Switch))
                 {
-                    _pcm.StartCompressor();
+                    _pcm.SetSolenoidOutput(1, true);
                     Debug.Print("StartCompressor");
                 }
                 if (StopCompressor)
                 {
-                    _pcm.StopCompressor();
+					_pcm.SetSolenoidOutput(1, false);
+					
                     Debug.Print("StopCompressor");
                 }
 
@@ -122,9 +123,33 @@ namespace HERO_XInput_Gampad_Example
                     }
                 }
 
+                Boolean LeftForward = _gamepad.GetButton(5);
+                Boolean LeftBackward = _gamepad.GetButton(7);
+                Boolean RightForward = _gamepad.GetButton(6);
+                Boolean RightBackward = _gamepad.GetButton(8);
 
-                float LeftY = _gamepad.GetAxis(1); //Left Joystick
-                float RightY = _gamepad.GetAxis(3); //Right Joystick
+                float LeftY = 0;
+                float RightY = 0;
+                //Talon SRX == Drive System
+                if (LeftForward)
+                {
+                    LeftY = (float) (0.5);
+                }
+                if (LeftBackward)
+                {
+                    LeftY = (float)(-0.5);
+
+                }
+                if (RightForward)
+                {
+                    RightY = (float)(0.5);
+                }
+                if (RightBackward)
+                {
+                    RightY = (float)(-0.5);
+                }
+                //     float LeftY = _gamepad.GetAxis(1); //Left Joystick
+                //    float RightY = _gamepad.GetAxis(3); //Right Joystick
 
                 tal1.Set(ControlMode.PercentOutput, LeftY * -1); //moving tal1 with left joystick
                                                                  //   Debug.Print("Left Axis: " + LeftY);
