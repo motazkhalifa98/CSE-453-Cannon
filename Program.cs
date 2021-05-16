@@ -16,9 +16,9 @@ namespace HERO_XInput_Gampad_Example
     {
         GameController _gamepad = new GameController(UsbHostDevice.GetInstance(0)); //creating a controller object
         static CTRE.Phoenix.PneumaticControlModule _pcm = new CTRE.Phoenix.PneumaticControlModule(0); //creating a PCM object
-        SafeOutputPort digitalOut1 = new SafeOutputPort(CTRE.HERO.IO.Port1.Pin4, false);  //PIN 4 > IN2
-        SafeOutputPort digitalOut2 = new SafeOutputPort(CTRE.HERO.IO.Port1.Pin5, false);   //PIN 5 > IN1
-        InputPort inputDead = new InputPort(CTRE.HERO.IO.Port6.Pin4, false, Port.ResistorMode.PullDown); //Deadman switch, Port6 Pin4
+        SafeOutputPort digitalOut1 = new SafeOutputPort(CTRE.HERO.IO.Port1.Pin4, false);  //Port1, PIN 4 on Hero Board > IN2 in L298 Connected to Linear Actuator
+        SafeOutputPort digitalOut2 = new SafeOutputPort(CTRE.HERO.IO.Port1.Pin5, false);   //Port1, PIN 5 on Hero Board > IN1 in L298 Connected to Linear Actuator
+        InputPort inputDead = new InputPort(CTRE.HERO.IO.Port6.Pin4, false, Port.ResistorMode.PullDown); //Deadman switch, Port6 Pin4 on Hero Board
         InputPort inputPressure = new InputPort(CTRE.HERO.IO.Port6.Pin5, false, Port.ResistorMode.Disabled); //Input Pressure from Pi Port 26 connected to Port6 Pin5
         TalonSRX tal1 = new TalonSRX(1); //first Talon, ID = 1
         TalonSRX tal2 = new TalonSRX(2);//second Talon, ID = 2
@@ -26,7 +26,7 @@ namespace HERO_XInput_Gampad_Example
 
         public void RunForever()
         {
-            _pcm.SetSolenoidOutput(1, false); //Initialize the compressor to be turned off
+            _pcm.SetSolenoidOutput(1, false); //Initialize the compressor to be turned off, compressor ID = 1
             Boolean SolenoidTimer = false;
             tal1.ConfigFactoryDefault();
             tal2.ConfigFactoryDefault();
@@ -68,7 +68,7 @@ namespace HERO_XInput_Gampad_Example
                 }
 
                 //Pressure Sensor
-                Boolean Pressure_Switch = inputPressure.Read();
+                Boolean Pressure_Switch = inputPressure.Read(); //Input from Raspberry Pi
                 String pressure = "Under threshold";
                 if (Pressure_Switch)
                 {
@@ -106,7 +106,7 @@ namespace HERO_XInput_Gampad_Example
                 //Debug.Print("Button Value: " + dead);
                 if (FIRE && (!Deadman_Switch)) //If Y is pressed and deadman switch is off
                 {
-                    _pcm.SetSolenoidOutput(0, true); //Open Solenoid/Fire
+                    _pcm.SetSolenoidOutput(0, true); //Open Solenoid/Fire ID = 0 for solenoid
                     solenoidPeriod = (500 * TimeSpan.TicksPerMillisecond) + DateTime.Now.Ticks; //Start timer for half a second
                     Debug.Print("FIRE");
                     SolenoidTimer = true;
